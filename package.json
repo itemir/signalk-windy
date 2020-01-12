@@ -1,0 +1,26 @@
+{
+  "name": "signalk-windy",
+  "version": "0.0.1",
+  "description": "SignalK plugin for submitting weather information to Windy.com",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "signalk-node-server-plugin"
+  ],
+  "author": "Ilker Temir <ilker@ilkertemir.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "request": "^2.88.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itemir/signalk-windy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itemir/signalk-windy/issues"
+  },
+  "homepage": "https://github.com/itemir/signalk-windy#readme",
+  "devDependencies": {}
+}
