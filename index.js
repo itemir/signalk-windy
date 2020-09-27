@@ -136,8 +136,6 @@ module.exports = function(app) {
         json: data
       };
 
-      app.error(JSON.stringify(httpOptions));
-
       request(httpOptions, function (error, response, body) {
         if (!error || response.statusCode == 200) {
           position = null;
