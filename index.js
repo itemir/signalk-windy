@@ -79,10 +79,10 @@ module.exports = function(app) {
         path: 'navigation.position',
         period: POLL_INTERVAL * 1000
       }, {
-        path: 'environment.wind.directionTrue',
+        path: 'environment.wind.directionGround',
         period: POLL_INTERVAL * 1000
       }, {
-        path: 'environment.wind.speedTrue',
+        path: 'environment.wind.speedOverGround',
         period: POLL_INTERVAL * 1000
       }, {
         path: 'environment.water.temperature',
@@ -174,11 +174,11 @@ module.exports = function(app) {
       case 'navigation.position':
         position = value;
         break;
-      case 'environment.wind.speedTrue':
+      case 'environment.wind.speedOverGround':
         windSpeed = value.toFixed(2);
         windSpeed = parseFloat(windSpeed);
         break;
-      case 'environment.wind.directionTrue':
+      case 'environment.wind.directionGround':
         windDirection = radiantToDegrees(value);
         windDirection = Math.round(windDirection);
         break;
