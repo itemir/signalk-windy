@@ -22,6 +22,8 @@ module.exports = function(app) {
   var plugin = {};
   var unsubscribes = [];
   var submitProcess;
+  var statusProcess;
+  var lastSuccessfulUpdate;
   var name = app.getSelfPath('name');
 
   var position;
@@ -73,6 +75,8 @@ module.exports = function(app) {
       return
     } 
 
+    app.setPluginStatus(`Submitting weather report every ${options.submitInterval} minutes`);
+
     let subscription = {
       context: 'vessels.self',
       subscribe: [{
@@ -105,11 +109,19 @@ module.exports = function(app) {
 
     app.debug(`Starting submission process every ${options.submitInterval} minutes`);
 
+    statusProcess = setInterval( function() {
+      if (!lastSuccessfulUpdate) {
+        return;
+      }
+      let since = timeSince(lastSuccessfulUpdate);
+      app.setPluginStatus(`Last successful submission was ${since} ago`);
+    }, 60*1000);
+
     submitProcess = setInterval( function() {
       if ( (position == null) || (windSpeed == null) || (windDirection == null) ||
            (temperature == null) ) {
-	let message = 'Not submitting position to due to lack of position, ';
-	message += 'wind speed, wind direction or temperature.';
+	let message = 'Not submitting position due to lack of position, wind ' +
+	              'speed, wind direction or temperature.';
 	app.debug(message);
         return
       }
@@ -144,6 +156,7 @@ module.exports = function(app) {
       request(httpOptions, function (error, response, body) {
         if (!error || response.statusCode == 200) {
           app.debug('Weather report successfully submitted');
+	  lastSuccessfulUpdate = Date.now();
           position = null;
           windSpeed = null;
           windDirection = null;
@@ -160,7 +173,9 @@ module.exports = function(app) {
   }
 
   plugin.stop =  function() {
+    clearInterval(statusProcess);
     clearInterval(submitProcess);
+    app.setPluginStatus('Pluggin stopped');
   };
 
   function radiantToDegrees(rad) {
@@ -202,11 +217,46 @@ module.exports = function(app) {
         pressure = parseFloat(value);
         break;
       case 'environment.outside.humidity':
-        humidity = parseFloat(value);
+        humidity = Math.round(100*parseFloat(value));
         break;
       default:
         app.debug('Unknown path: ' + path);
     }
+  }
+
+  function timeSince(date) {
+    var seconds = Math.floor((new Date() - date) / 1000);
+    var interval = seconds / 31536000;
+    if (interval > 1) {
+      return Math.floor(interval) + " years";
+    }
+    interval = seconds / 2592000;
+    if (interval > 1) {
+      return Math.floor(interval) + " months";
+    }
+    interval = seconds / 86400;
+    if (interval > 1) {
+      return Math.floor(interval) + " days";
+    }
+    interval = seconds / 3600;
+    if (interval > 1) {
+      let time = Math.floor(interval);
+      if (time == 1) {
+        return (`${time} hour`);
+      } else {
+	return (msg = `${time} hours`);
+      }
+    }
+    interval = seconds / 60;
+    if (interval > 1) {
+      let time = Math.floor(interval);
+      if (time == 1) {
+        return (`${time} minute`);
+      } else {
+	return (msg = `${time} minutes`);
+      }
+    }
+    return Math.floor(seconds) + " seconds";
   }
 
   return plugin;
