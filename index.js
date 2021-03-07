@@ -100,12 +100,17 @@ module.exports = function(app) {
     };
 
     app.subscriptionmanager.subscribe(subscription, unsubscribes, function() {
-      app.error('Subscription error');
+      app.debug('Subscription error');
     }, data => processDelta(data));
+
+    app.debug(`Starting submission process every ${options.submitInterval} minutes`);
 
     submitProcess = setInterval( function() {
       if ( (position == null) || (windSpeed == null) || (windDirection == null) ||
            (temperature == null) ) {
+	let message = 'Not submitting position to due to lack of position, ';
+	message += 'wind speed, wind direction or temperature.';
+	app.debug(message);
         return
       }
       let data = {
@@ -138,6 +143,7 @@ module.exports = function(app) {
 
       request(httpOptions, function (error, response, body) {
         if (!error || response.statusCode == 200) {
+          app.debug('Weather report successfully submitted');
           position = null;
           windSpeed = null;
           windDirection = null;
@@ -146,8 +152,8 @@ module.exports = function(app) {
           pressure = null;
           humidity = null;
         } else {
-          app.error("Error submitting to Windy.com API");
-          //app.error(body); 
+          app.debug('Error submitting to Windy.com API');
+          app.debug(body); 
         }
       }); 
     }, options.submitInterval * 60 * 1000);
@@ -199,7 +205,7 @@ module.exports = function(app) {
         humidity = parseFloat(value);
         break;
       default:
-        app.error('Unknown path: ' + path);
+        app.debug('Unknown path: ' + path);
     }
   }
 
