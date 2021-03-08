@@ -4,8 +4,8 @@
 
 See a sample station [here](https://www.windy.com/station/pws-bf06d21ca) and [here](https://www.windy.com/station/pws-f0717799).
 
-Pre-requisites:
+Important Notes:
   * Requires `navigation.position`, `environment.wind.directionGround`, `environment.wind.speedOverGround` and `environment.outside.temperature`
-  ** You will likely need [signalk-derived-data](https://github.com/SignalK/signalk-derived-data) plugin for `environment.wind.directionGround` and `environment.wind.speedOverGround`.
+  * You will likely need [signalk-derived-data](https://github.com/SignalK/signalk-derived-data) plugin for `environment.wind.directionGround` and `environment.wind.speedOverGround`.
   * `environment.outside.pressure` and `environment.outside.humidity` are optional
   * An API key that can be obtained from [Windy](https://stations.windy.com/stations)
