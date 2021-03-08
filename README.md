@@ -8,4 +8,5 @@ Important Notes:
   * Requires `navigation.position`, `environment.wind.directionGround`, `environment.wind.speedOverGround` and `environment.outside.temperature`
   * You will likely need [signalk-derived-data](https://github.com/SignalK/signalk-derived-data) plugin for `environment.wind.directionGround` and `environment.wind.speedOverGround`.
   * `environment.outside.pressure` and `environment.outside.humidity` are optional
-  * An API key that can be obtained from [Windy](https://stations.windy.com/stations)
+  * You need an API key that you can obtain from [Windy](https://stations.windy.com/stations)
+  * You first need to create a station on [Windy](https://github.com/itemir/signalk-magnetic-variation), enter the corresponding ID to plugin configuration
