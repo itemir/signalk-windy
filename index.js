@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-const POLL_INTERVAL = 10      // Poll every N seconds
+const POLL_INTERVAL = 1      // Poll every N seconds
 const API_BASE = 'https://stations.windy.com./pws/update/';
 
 const request = require('request')
@@ -28,6 +28,7 @@ module.exports = function(app) {
 
   var position;
   var windSpeed;
+  var windGust;
   var windDirection;
   var waterTemperature;
   var temperature;
@@ -141,6 +142,7 @@ module.exports = function(app) {
           { station: options.stationId,
             temp: temperature,
             wind: windSpeed,
+	    gust: windGust,
             winddir: windDirection,
             pressure: pressure,
             rh: humidity }
@@ -153,12 +155,14 @@ module.exports = function(app) {
         json: data
       };
 
+      app.debug(`Submitting data: ${JSON.stringify(data)}`);
       request(httpOptions, function (error, response, body) {
         if (!error || response.statusCode == 200) {
           app.debug('Weather report successfully submitted');
 	  lastSuccessfulUpdate = Date.now();
           position = null;
           windSpeed = null;
+          windGust = null;
           windDirection = null;
           waterTemperature = null;
           temperature = null;
@@ -198,6 +202,9 @@ module.exports = function(app) {
       case 'environment.wind.speedOverGround':
         windSpeed = value.toFixed(2);
         windSpeed = parseFloat(windSpeed);
+	if ((windGust == null) || (windSpeed > windGust)) {
+	  windGust = windSpeed;
+	}
         break;
       case 'environment.wind.directionGround':
         windDirection = radiantToDegrees(value);
