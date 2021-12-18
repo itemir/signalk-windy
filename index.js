@@ -15,8 +15,13 @@
 
 const POLL_INTERVAL = 1      // Poll every N seconds
 const API_BASE = 'https://stations.windy.com./pws/update/';
-
 const request = require('request')
+
+const median = arr => {
+  const mid = Math.floor(arr.length / 2),
+    nums = [...arr].sort((a, b) => a - b);
+  return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+};
 
 module.exports = function(app) {
   var plugin = {};
@@ -27,7 +32,7 @@ module.exports = function(app) {
   var name = app.getSelfPath('name');
 
   var position;
-  var windSpeed;
+  var windSpeed = [];
   var windGust;
   var windDirection;
   var waterTemperature;
@@ -119,7 +124,7 @@ module.exports = function(app) {
     }, 60*1000);
 
     submitProcess = setInterval( function() {
-      if ( (position == null) || (windSpeed == null) || (windDirection == null) ||
+      if ( (position == null) || (windSpeed.length == 0) || (windDirection == null) ||
            (temperature == null) ) {
 	let message = 'Not submitting position due to lack of position, wind ' +
 	              'speed, wind direction or temperature.';
@@ -141,7 +146,7 @@ module.exports = function(app) {
         observations: [
           { station: options.stationId,
             temp: temperature,
-            wind: windSpeed,
+            wind: median(windSpeed),
 	    gust: windGust,
             winddir: windDirection,
             pressure: pressure,
@@ -161,7 +166,7 @@ module.exports = function(app) {
           app.debug('Weather report successfully submitted');
 	  lastSuccessfulUpdate = Date.now();
           position = null;
-          windSpeed = null;
+          windSpeed = [];
           windGust = null;
           windDirection = null;
           waterTemperature = null;
@@ -200,11 +205,12 @@ module.exports = function(app) {
         position = value;
         break;
       case 'environment.wind.speedOverGround':
-        windSpeed = value.toFixed(2);
-        windSpeed = parseFloat(windSpeed);
-	if ((windGust == null) || (windSpeed > windGust)) {
-	  windGust = windSpeed;
+        let speed = value.toFixed(2);
+        speed = parseFloat(speed);
+	if ((windGust == null) || (speed > windGust)) {
+	  windGust = speed;
 	}
+	windSpeed.push(speed);
         break;
       case 'environment.wind.directionGround':
         windDirection = radiantToDegrees(value);

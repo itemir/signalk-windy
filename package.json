@@ -1,6 +1,6 @@
 {
   "name": "signalk-windy",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "SignalK plugin for submitting weather information to Windy.com",
   "main": "index.js",
   "scripts": {
