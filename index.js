@@ -196,6 +196,9 @@ module.exports = function(app) {
   }
 
   function processDelta(data) {
+    if (!data.updates || !data.updates.length || !data.updates[0].values || !data.updates[0].values.length) {
+      return;
+    }
     let dict = data.updates[0].values[0];
     let path = dict.path;
     let value = dict.value;
