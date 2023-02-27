@@ -116,12 +116,17 @@ module.exports = function(app) {
     app.debug(`Starting submission process every ${options.submitInterval} minutes`);
 
     statusProcess = setInterval( function() {
-      if (!lastSuccessfulUpdate) {
-        return;
+      var statusMessage = '';
+      if (lastSuccessfulUpdate) {
+        let since = timeSince(lastSuccessfulUpdate);
+      	statusMessage += `Successful submission ${since} ago. `;
       }
-      let since = timeSince(lastSuccessfulUpdate);
-      app.setPluginStatus(`Last successful submission was ${since} ago`);
-    }, 60*1000);
+      if ((windSpeed.length > 0) && (windGust != null)) {
+      	let currentWindSpeed = windSpeed[windSpeed.length-1];
+      	statusMessage += `Wind speed is ${currentWindSpeed}kts and gust is ${windGust}kts.`;
+      } 
+      app.setPluginStatus(statusMessage);
+    }, 5 * 1000);
 
     submitProcess = setInterval( function() {
       if ( (position == null) || (windSpeed.length == 0) || (windDirection == null) ||
